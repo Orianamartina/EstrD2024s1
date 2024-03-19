@@ -56,7 +56,7 @@ siguiente d =
 
 -- Es una funcion parcial por que no esta definida para todas las posibilidades de dir
 
---4
+--3.2
 
 data DiaDeSemana = Lunes | Martes | Miercoles | Jueves | Viernes | Sabado | Domingo deriving Show
 
@@ -90,3 +90,67 @@ vieneDespues dia1 dia2 = (numeroDeDiaDeSemana dia1) == (numeroDeDiaDeSemana dia2
 
 estaEnElMedio :: DiaDeSemana -> Bool
 estaEnElMedio dia = (numeroDeDiaDeSemana dia) > 1 && (numeroDeDiaDeSemana dia) < 7
+
+--3.3
+negar :: Bool -> Bool
+negar opt = case opt of
+    True -> False
+    False -> True
+
+implica :: Bool -> Bool -> Bool
+implica True False = False
+implica _ _ = True
+
+yTambien :: Bool -> Bool -> Bool
+yTambien True True = True
+yTambien _ _ = False
+
+oBien :: Bool -> Bool -> Bool
+oBien True _ = True
+oBien _ True = True
+oBien _ _ = False
+
+--4
+data Persona = P String Int 
+
+nombre :: Persona -> String
+nombre (P n _) = n
+
+edad :: Persona -> Int
+nombre (P _ e) = e
+
+crecer :: Persona -> Persona
+crecer (P n e) -> P n (e+1)
+
+cambioDeNombre :: String -> Persona -> Persona
+cambioDeNombre nombre (P n e) = P nombre edad
+
+esMayorQueLaOtra :: Persona -> Persona -> Bool
+esMayorQueLaOtra (P _ e1) (P _ e2) = e1 > e2
+
+laQueEsMayor :: Persona -> Persona -> Persona
+laQueEsMayor p1 p2 = if esMayorQueLaOtra p1 p2 then p1 else p2
+
+--4.2
+
+data TipoDePokemon = Agua | Fuego | Planta
+data Pokemon = Pok TipoDePokemon Int
+
+data Entrenador = Ent String Pokemon Pokemon
+
+tipoSuperaA :: TipoDePokemon -> TipoDePokemon
+tipoSuperaA Agua = Planta
+tipoSuperaA Fuego = Agua
+tipoSuperaA Planta = Fuego
+
+esDelMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
+esDelMismoTipo Agua Agua = True
+esDelMismoTipo Fuego Fuego = True
+esDelMismoTipo Planta Planta = True
+esDelMismoTipo _ _ = False
+
+superaA :: Pokemon -> Pokemon -> Bool
+superaA (Pok t _) (Pok t2 _) = esDelMismoTipo (tipoSuperaA t t2) t 
+
+cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
+cantidadDePokemonDe tipo (Ent _ (Pok t1 _) (Pok t2 _)) = 
