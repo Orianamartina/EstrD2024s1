@@ -111,19 +111,19 @@ oBien _ True = True
 oBien _ _ = False
 
 --4
-data Persona = P String Int 
+data Persona = P String Int deriving Show
 
 nombre :: Persona -> String
 nombre (P n _) = n
 
 edad :: Persona -> Int
-nombre (P _ e) = e
+edad (P _ e) = e
 
 crecer :: Persona -> Persona
-crecer (P n e) -> P n (e+1)
+crecer (P n e) = P n (e+1)
 
 cambioDeNombre :: String -> Persona -> Persona
-cambioDeNombre nombre (P n e) = P nombre edad
+cambioDeNombre nombre (P n e) = P nombre e
 
 esMayorQueLaOtra :: Persona -> Persona -> Bool
 esMayorQueLaOtra (P _ e1) (P _ e2) = e1 > e2
@@ -133,7 +133,7 @@ laQueEsMayor p1 p2 = if esMayorQueLaOtra p1 p2 then p1 else p2
 
 --4.2
 
-data TipoDePokemon = Agua | Fuego | Planta
+data TipoDePokemon = Agua | Fuego | Planta deriving Show
 data Pokemon = Pok TipoDePokemon Int
 
 data Entrenador = Ent String Pokemon Pokemon
@@ -150,7 +150,20 @@ esDelMismoTipo Planta Planta = True
 esDelMismoTipo _ _ = False
 
 superaA :: Pokemon -> Pokemon -> Bool
-superaA (Pok t _) (Pok t2 _) = esDelMismoTipo (tipoSuperaA t t2) t 
+superaA (Pok t _) (Pok t2 _) = esDelMismoTipo (tipoSuperaA t2) t 
+
+esDelTipo :: TipoDePokemon -> Pokemon -> Bool
+esDelTipo Agua (Pok t _) = esDelMismoTipo Agua t
+esDelTipo Fuego (Pok t _) = esDelMismoTipo Fuego t
+esDelTipo Planta (Pok t _) = esDelMismoTipo Planta t
+
+cantidadDelTipo :: TipoDePokemon -> Pokemon -> Pokemon -> Int
+cantidadDelTipo tipo (Pok t1 e1) (Pok t2 e2) = if yTambien (esDelTipo tipo (Pok t1 e1)) (esDelTipo tipo (Pok t2 e2)) then 2
+                            else if oBien (esDelTipo tipo (Pok t1 e1)) (esDelTipo tipo (Pok t2 e2)) then 1
+                            else 0
 
 cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
-cantidadDePokemonDe tipo (Ent _ (Pok t1 _) (Pok t2 _)) = 
+cantidadDePokemonDe tipo (Ent _ (Pok t1 e1) (Pok t2 e2)) = cantidadDelTipo tipo (Pok t1 e1) (Pok t2 e2)
+
+juntarPokemon :: (Entrenador, Entrenador) -> [Pokemon]
+juntarPokemon ((Ent _ (Pok t1 e1) (Pok t2 e2)), (Ent _ (Pok t3 e3) (Pok t4 e4))) = [(Pok t1 e1), (Pok t2 e2), (Pok t3 e3), (Pok t4 e4)] 
