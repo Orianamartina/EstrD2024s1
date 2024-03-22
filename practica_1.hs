@@ -97,18 +97,22 @@ negar opt = case opt of
     True -> False
     False -> True
 
+valorDe :: Bool -> Int
+valorDe False = -1
+valorDe True = 1
+
 implica :: Bool -> Bool -> Bool
-implica True False = False
-implica _ _ = True
+implica a True = True
+implica a False = negar a
 
 yTambien :: Bool -> Bool -> Bool
-yTambien True True = True
-yTambien _ _ = False
+yTambien True b = b
+yTambien False b = False
 
 oBien :: Bool -> Bool -> Bool
-oBien True _ = True
-oBien _ True = True
-oBien _ _ = False
+oBien True b = True
+oBien False b = b 
+
 
 --4
 data Persona = P String Int deriving Show
@@ -138,32 +142,59 @@ data Pokemon = Pok TipoDePokemon Int
 
 data Entrenador = Ent String Pokemon Pokemon
 
-tipoSuperaA :: TipoDePokemon -> TipoDePokemon
-tipoSuperaA Agua = Planta
-tipoSuperaA Fuego = Agua
-tipoSuperaA Planta = Fuego
-
 esDelMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
 esDelMismoTipo Agua Agua = True
 esDelMismoTipo Fuego Fuego = True
 esDelMismoTipo Planta Planta = True
 esDelMismoTipo _ _ = False
 
-superaA :: Pokemon -> Pokemon -> Bool
-superaA (Pok t _) (Pok t2 _) = esDelMismoTipo (tipoSuperaA t2) t 
-
 esDelTipo :: TipoDePokemon -> Pokemon -> Bool
-esDelTipo Agua (Pok t _) = esDelMismoTipo Agua t
-esDelTipo Fuego (Pok t _) = esDelMismoTipo Fuego t
-esDelTipo Planta (Pok t _) = esDelMismoTipo Planta t
+esDelTipo Agua pok = esDelMismoTipo Agua (tipoDe pok)
+esDelTipo Fuego pok = esDelMismoTipo Fuego (tipoDe pok)
+esDelTipo Planta pok = esDelMismoTipo Planta (tipoDe pok)
 
-cantidadDelTipo :: TipoDePokemon -> Pokemon -> Pokemon -> Int
-cantidadDelTipo tipo (Pok t1 e1) (Pok t2 e2) = if yTambien (esDelTipo tipo (Pok t1 e1)) (esDelTipo tipo (Pok t2 e2)) then 2
-                            else if oBien (esDelTipo tipo (Pok t1 e1)) (esDelTipo tipo (Pok t2 e2)) then 1
-                            else 0
+tipoDe :: Pokemon -> TipoDePokemon
+tipoDe (Pok t _) = t
+
+superaA :: Pokemon -> Pokemon -> Bool
+superaA pok1 (Pok Agua _) = esDelTipo Planta pok1
+superaA pok1 (Pok Fuego _) = esDelTipo Agua pok1
+superaA pok1 (Pok Planta _) = esDelTipo Fuego pok1
+
 
 cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
-cantidadDePokemonDe tipo (Ent _ (Pok t1 e1) (Pok t2 e2)) = cantidadDelTipo tipo (Pok t1 e1) (Pok t2 e2)
+cantidadDePokemonDe tipo (Ent _ pok1 pok2) = if yTambien (esDelTipo tipo pok1)  (esDelTipo tipo pok2) then 2 
+                                            else if oBien (esDelTipo tipo pok1) (esDelTipo tipo pok2) then 1
+                                            else 0
+
+listaDePokemonDe :: Entrenador -> [Pokemon]
+listaDePokemonDe (Ent _ pok1 pok2) = [pok1, pok2]
 
 juntarPokemon :: (Entrenador, Entrenador) -> [Pokemon]
-juntarPokemon ((Ent _ (Pok t1 e1) (Pok t2 e2)), (Ent _ (Pok t3 e3) (Pok t4 e4))) = [(Pok t1 e1), (Pok t2 e2), (Pok t3 e3), (Pok t4 e4)] 
+juntarPokemon (ent1, ent2) = listaDePokemonDe ent1 ++ listaDePokemonDe ent2
+
+
+-- 5
+loMismo :: a -> a 
+loMismo x = x
+
+siempreSiete :: a -> Int
+siempreSiete _ = 7
+
+swap :: (a,b) -> (b, a)
+swap (x , y) = (y, x)
+
+-- 6
+
+estaVacia :: [a] -> Bool
+estaVacia [] = True
+estaVacia _ = False
+
+elPrimero :: [a] -> a
+elPrimero (x:xs) = x
+
+sinElPrimero :: [a] -> [a]
+sinElPrimero (x:xs) = xs
+
+splitHead :: [a] -> (a, [a])
+splitHead x = (elPrimero x, sinElPrimero x)
