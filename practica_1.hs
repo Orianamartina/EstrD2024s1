@@ -102,7 +102,7 @@ valorDe True = 1
 
 implica :: Bool -> Bool -> Bool
 implica a True = True
-implica a False = negar a
+implica a _ = negar a
 
 yTambien :: Bool -> Bool -> Bool
 yTambien True b = b
