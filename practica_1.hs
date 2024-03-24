@@ -106,7 +106,7 @@ implica a _ = negar a
 
 yTambien :: Bool -> Bool -> Bool
 yTambien True b = b
-yTambien False b = False
+yTambien False _ = False
 
 oBien :: Bool -> Bool -> Bool
 oBien True b = True
