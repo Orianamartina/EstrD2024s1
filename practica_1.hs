@@ -85,8 +85,7 @@ numeroDeDiaDeSemana dia = case dia of
     Domingo -> 7
 
 vieneDespues :: DiaDeSemana -> DiaDeSemana -> Bool
-vieneDespues Lunes Domingo = True
-vieneDespues dia1 dia2 = (numeroDeDiaDeSemana dia1) == (numeroDeDiaDeSemana dia2)+1
+vieneDespues dia1 dia2 = (numeroDeDiaDeSemana dia1) > (numeroDeDiaDeSemana dia2)
 
 estaEnElMedio :: DiaDeSemana -> Bool
 estaEnElMedio dia = (numeroDeDiaDeSemana dia) > 1 && (numeroDeDiaDeSemana dia) < 7
@@ -139,7 +138,6 @@ laQueEsMayor p1 p2 = if esMayorQueLaOtra p1 p2 then p1 else p2
 
 data TipoDePokemon = Agua | Fuego | Planta deriving Show
 data Pokemon = Pok TipoDePokemon Int
-
 data Entrenador = Ent String Pokemon Pokemon
 
 esDelMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
@@ -160,7 +158,6 @@ superaA :: Pokemon -> Pokemon -> Bool
 superaA pok1 (Pok Agua _) = esDelTipo Planta pok1
 superaA pok1 (Pok Fuego _) = esDelTipo Agua pok1
 superaA pok1 (Pok Planta _) = esDelTipo Fuego pok1
-
 
 cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
 cantidadDePokemonDe tipo (Ent _ pok1 pok2) = if yTambien (esDelTipo tipo pok1)  (esDelTipo tipo pok2) then 2 
