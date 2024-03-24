@@ -136,8 +136,8 @@ laQueEsMayor p1 p2 = if esMayorQueLaOtra p1 p2 then p1 else p2
 --4.2
 
 data TipoDePokemon = Agua | Fuego | Planta deriving Show
-data Pokemon = Pok TipoDePokemon Int
-data Entrenador = Ent String Pokemon Pokemon
+data Pokemon = Pok TipoDePokemon Int deriving Show
+data Entrenador = Ent String Pokemon Pokemon deriving Show
 
 esDelMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
 esDelMismoTipo Agua Agua = True
@@ -158,12 +158,14 @@ superaA pok1 (Pok Agua _) = esDelTipo Planta pok1
 superaA pok1 (Pok Fuego _) = esDelTipo Agua pok1
 superaA pok1 (Pok Planta _) = esDelTipo Fuego pok1
 
-cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
-cantidadDePokemonDe tipo (Ent _ pok1 pok2) = if yTambien (esDelTipo tipo pok1)  (esDelTipo tipo pok2) then 2 
-                                            else if oBien (esDelTipo tipo pok1) (esDelTipo tipo pok2) then 1
-                                            else 0
+boolAInt :: Bool -> Int
+boolAInt True = 1
+boolAInt _ = 0
 
-listaDePokemonDe :: Entrenador -> [Pokemon]
+cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
+cantidadDePokemonDe tipo (Ent _ pok1 pok2) =  boolAInt (esDelTipo tipo pok1) +  boolAInt (esDelTipo tipo pok2)
+
+listaDePokemonDe :: Entrenador -> [Pokemon] 
 listaDePokemonDe (Ent _ pok1 pok2) = [pok1, pok2]
 
 juntarPokemon :: (Entrenador, Entrenador) -> [Pokemon]
