@@ -109,9 +109,8 @@ yTambien True b = b
 yTambien False _ = False
 
 oBien :: Bool -> Bool -> Bool
-oBien True b = True
-oBien False b = b 
-
+oBien False b = b
+oBien _ _ = True
 
 --4
 data Persona = P String Int deriving Show
