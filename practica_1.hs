@@ -101,7 +101,7 @@ valorDe False = -1
 valorDe True = 1
 
 implica :: Bool -> Bool -> Bool
-implica a True = True
+implica _ True = True
 implica a _ = negar a
 
 yTambien :: Bool -> Bool -> Bool
