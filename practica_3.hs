@@ -110,3 +110,38 @@ levelN n (NodeT x t1 t2) = if n == 0 then [x] else (levelN (n-1) t1) ++ (levelN 
 listPerLevel :: Tree a -> [[a]]
 listPerLevel EmptyT = []
 listPerLevel (NodeT x t1 t2) = [x] : listPerLevel t1 ++ listPerLevel t2
+
+longitud :: [a] -> Int
+longitud [] = 0
+longitud (x:xs) = 1 + longitud xs
+
+listaMasLarga :: [a] -> [a] -> [a]
+listaMasLarga l1 l2 = if longitud(l1) > longitud(l2) then l1 else l2
+
+ramaMasLarga :: Tree a -> [a]
+ramaMasLarga EmptyT = []
+ramaMasLarga (NodeT x t1 t2) = x :( listaMasLarga (ramaMasLarga t1) (ramaMasLarga t2))
+
+todosLosCaminos :: Tree a -> [[a]]
+todosLosCaminos EmptyT = []
+todosLosCaminos (NodeT x EmptyT EmptyT) = [[x]]
+todosLosCaminos (NodeT x left right) = map (x:) (todosLosCaminos left ++ todosLosCaminos right)
+
+--2.2
+
+data ExpA = Valor Int | Sum ExpA ExpA | Prod ExpA ExpA | Neg ExpA deriving Show
+
+eval :: ExpA -> Int
+eval (Valor n) = n
+eval (Sum e1 e2) = eval e1 + eval e2
+eval (Prod e1 e2) = eval e1 * eval e2
+eval (Neg e1) = - (eval e1)
+
+simplificar :: ExpA -> ExpA
+simplificar (Sum (Valor 0) x) = x
+simplificar (Sum x (Valor 0)) = x
+simplificar (Prod (Valor 0) x) = (Valor 0)
+simplificar (Prod x (Valor 0)) = (Valor 0)
+simplificar (Prod (Valor 1) x ) = x
+simplificar (Prod x (Valor 1)) = x
+simplificar (Neg (Neg x)) = x
