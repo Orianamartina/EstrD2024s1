@@ -90,3 +90,23 @@ leaves :: Tree a -> [a]
 leaves EmptyT = []
 leaves (NodeT x EmptyT EmptyT) = [x]
 leaves (NodeT _ t1 t2) = leaves t1 ++ leaves t2
+
+heightT :: Tree a -> Int
+heightT EmptyT = 0
+heightT (NodeT _ t1 t2) = 1 + max (heightT t1)  (heightT t2)
+
+mirrorT :: Tree a -> Tree a
+mirrorT EmptyT = EmptyT
+mirrorT (NodeT x t1 t2) = (NodeT x (mirrorT t2) (mirrorT t1))
+
+toList :: Tree a -> [a]
+toList EmptyT = []
+toList (NodeT x t1 t2) = x : (toList t1 ++ toList t2)
+
+levelN :: Int -> Tree a -> [a]
+levelN _ EmptyT = []
+levelN n (NodeT x t1 t2) = if n == 0 then [x] else (levelN (n-1) t1) ++ (levelN (n-1) t2)
+
+listPerLevel :: Tree a -> [[a]]
+listPerLevel EmptyT = []
+listPerLevel (NodeT x t1 t2) = 
