@@ -68,15 +68,15 @@ data Tree a = EmptyT | NodeT a (Tree a) (Tree a) deriving Show
 
 sumarT :: Tree Int -> Int
 sumarT EmptyT = 0
-sumarT (NodeT n arbol1 arbol2) = n + sumarT arbol1 + sumarT arbol2
+sumarT (NodeT n t1 t2) = n + sumarT t1 + sumarT t2
 
 sizeT :: Tree a -> Int
 sizeT EmptyT = 0
-sizeT (NodeT _ arbol1 arbol2) = 1 + sizeT arbol1 + sizeT arbol2
+sizeT (NodeT _ t1 t2) = 1 + sizeT t1 + sizeT t2
 
 mapDobleT :: Tree Int -> Tree Int
 mapDobleT EmptyT = EmptyT
-mapDobleT (NodeT n arbol1 arbol2) = (NodeT (2 * n) (mapDobleT arbol1)  (mapDobleT arbol2))
+mapDobleT (NodeT n t1 t2) = (NodeT (2 * n) (mapDobleT t1)  (mapDobleT t2))
 
 perteneceT :: Eq a => a -> Tree a -> Bool
 perteneceT _ EmptyT = False
@@ -109,4 +109,4 @@ levelN n (NodeT x t1 t2) = if n == 0 then [x] else (levelN (n-1) t1) ++ (levelN 
 
 listPerLevel :: Tree a -> [[a]]
 listPerLevel EmptyT = []
-listPerLevel (NodeT x t1 t2) = 
+listPerLevel (NodeT x t1 t2) = [x] : listPerLevel t1 ++ listPerLevel t2
