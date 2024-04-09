@@ -233,3 +233,17 @@ tienenProyecto (x:xs) proyecto = boolAInt (tieneProyecto x proyecto) + tienenPro
 cantQueTrabajanEn :: [Proyecto] -> Empresa -> Int
 cantQueTrabajanEn [] _ = 0
 cantQueTrabajanEn (x:xs) empresa = tienenProyecto (rolesDe empresa) x + cantQueTrabajanEn xs empresa
+
+cantPorProyecto :: [Proyecto] -> Empresa -> [Int]
+cantPorProyecto [] _ = []
+cantPorProyecto (x:xs) empresa = cantQueTrabajanEn [x] empresa : cantPorProyecto xs empresa
+
+zipL :: [a] -> [b] -> [(a, b)]
+zipL [] _ = []
+zipL _ [] = []
+zipL (x:xs) (y:ys) = (x, y) : zip xs ys
+
+asignadosPorProyecto :: Empresa -> [(Proyecto, Int)]
+asignadosPorProyecto (ConsEmpresa []) = []
+asignadosPorProyecto empresa = zipL (proyectos empresa) (cantPorProyecto (proyectos empresa) empresa) 
+
