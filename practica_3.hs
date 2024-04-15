@@ -107,9 +107,14 @@ levelN :: Int -> Tree a -> [a]
 levelN _ EmptyT = []
 levelN n (NodeT x t1 t2) = if n == 0 then [x] else (levelN (n-1) t1) ++ (levelN (n-1) t2)
 
+zipL :: [[a]] -> [[a]] -> [[a]]
+zipL [] l = l
+zipL l [] = l
+zipL (x:xs) (y:ys) = (x ++ y) ++ zipL xs ys
+
 listPerLevel :: Tree a -> [[a]]
-listPerLevel EmptyT = []
-listPerLevel (NodeT x t1 t2) = [x] : listPerLevel t1 ++ listPerLevel t2
+listPerLevel EmptyT = [[]]
+listPerLevel (NodeT x t1 t2) = [x] : (zipL (listPerLevel t1) (listPerLevel t2))
 
 longitud :: [a] -> Int
 longitud [] = 0
