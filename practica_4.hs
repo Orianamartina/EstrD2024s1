@@ -245,7 +245,6 @@ manada_2 = (M (Cazador "lobo_cazador" ["presa_1", "presa_2", "Presa_3", "presa_4
 lobo_1 :: Lobo
 lobo_1 = (Cazador "lobo_cazador" ["presa_1", "presa_2", "Presa_3", "presa_4", "presa_5"] (Explorador "lobo_explorador_1" ["territorio_1", "territorio_2", "territorio_3", "territorio_4", "territorio_5"] (Cria "cria_1")(Cria "cria_2"))(Explorador "lobo_explorar_2" ["territorio_4", "territorio_5"] (Cria "cria_3")(Cria "cria_4"))(Cazador "cazador_2" ["presa_6", "presa_7", "presa_8", "presa_9"] (Cria "cria_6") (Cria "cria_7") (Cria "cria_8")))
 
-
 buenaCazaDeLobos :: Lobo -> Int
 buenaCazaDeLobos (Cria _) = -1
 buenaCazaDeLobos (Explorador _  _ l1 l2) = buenaCazaDeLobos l1 + buenaCazaDeLobos l2
@@ -265,51 +264,39 @@ elAlfaDeLobos (Cazador n p l1 l2 l3) = elQueMasCazo (n, longitud p) (elQueMasCaz
 elAlfa :: Manada -> (Nombre, Int)
 elAlfa (M lobo) = elAlfaDeLobos lobo
 
--- losLobosQueExploraron :: Territorio -> Lobo -> [Nombre]
--- losLobosQueExploraron _ (Cria _)  = []
--- losLobosQueExploraron t (Cazador _ _ l1 l2 l3) = losLobosQueExploraron t l1 ++ losLobosQueExploraron t l2 ++ losLobosQueExploraron t l3 
--- losLobosQueExploraron t (Explorador n tr l1 l2) = if n == t then n : (losLobosQueExploraron l1 ++ losLobosQueExploraron l2) else (losLobosQueExploraron l1 ++ losLobosQueExploraron l2)
-
--- losQueExploraron :: Territorio -> Manada -> [Nombre]
--- losQueExploraron t (M lobo) = losLobosQueExploraron t lobo
-
--- territoriosDe :: Nombre -> [Territorio] -> [(Territorio, Nombre)]
--- territoriosDe _ [] = []
--- territoriosDe n (x:xs) = (n, x) : territoriosDe n xs
-
--- exploradoresPorTerritorioDeLobos :: Lobo -> [(Territorio, Nombre)]
--- exploradoresPorTerritorioDeLobos (Cria _) = []
--- exploradoresPorTerritorioDeLobos (Cazador _ _ l1 l2 l3) = exploradoresPorTerritorioDeLobos l1 ++ exploradoresPorTerritorioDeLobos l2 ++ exploradoresPorTerritorioDeLobos l3
--- exploradoresPorTerritorioDeLobos (Explorador n tr l1 l2) = territoriosDe n tr ++ exploradoresPorTerritorioDeLobos l1 ++ exploradoresPorTerritorioDeLobos l2
-
--- exploradoresPorTerritorioDeLobos :: Lobo -> [(Lobo, [Territorio])]
--- exploradoresPorTerritorioDE
-
--- sub :: Territorio -> Nombre -> [(Territorio, [Nombre])]
--- sub t n = 
-
--- agruparRepetidos :: [(Territorio, Nombre)] -> [(Territorio, [Nombre])]
--- agruparRepetidos [] = []
--- agruparRepetidos ((t, n):xs) =  
-
--- exploradoresPorTerritorio :: Manada -> [(Territorio, [Nombre])]
--- exploradoresPorTerritorio (M lobo) = exploradoresPorTerritorioDeLobos lobo
-
-zipL :: [a] -> [b] -> [(a, b)]
-zipL [] _ = []
-zipL _ [] = []
-zipL (x:xs) (y:ys) = (x, y) : zip xs ys
-
-territorios :: Lobo -> [Territorio]
-territorios (Cria _) = []
-territorios (Cazador _ _ l1 l2 l3) = territorios l1 ++ territorios l2 ++ territorios l3
-territorios (Explorador _ tr l1 l2) = tr ++ territorios l1 ++ territorios l2
-
 lobosQueExploraron :: Territorio -> Lobo -> [Nombre]
 lobosQueExploraron _ (Cria _) = []
 lobosQueExploraron t (Explorador n tr l1 l2) = if estaEn t tr then n : lobosQueExploraron t l1 ++ lobosQueExploraron t l2 else lobosQueExploraron t l1 ++ lobosQueExploraron t l2 
 lobosQueExploraron t (Cazador _ _ l1 l2 l3) = lobosQueExploraron t l1 ++ lobosQueExploraron t l2 ++ lobosQueExploraron t l3
 
-lobosPorTerritorio :: [Territorio] -> Lobo -> [Nombre]
+losQueExploraron :: Territorio -> Manada -> [Nombre]
+losQueExploraron t (M lobo) = lobosQueExploraron t lobo
+
+territorios :: Lobo -> [Territorio]
+territorios (Cria _) = []
+territorios (Cazador _ _ l1 l2 l3) = agregarSiNoEstan (territorios l1) (territorios l2 ++ territorios l3)
+territorios (Explorador _ tr l1 l2) = agregarSiNoEstan tr (territorios l1 ++ territorios l2)
+
+
+lobosPorTerritorio :: [Territorio] -> Lobo -> [[Nombre]]
 lobosPorTerritorio [] _ = []
-lobosPorTerritorio (x:xs) lobo = zipL (territorios lobo) ()
+lobosPorTerritorio (x:xs) lobo = lobosQueExploraron x lobo : lobosPorTerritorio xs lobo
+
+exploradoresPorTerritorioDeLobos :: Lobo -> [(Territorio, [Nombre])]
+exploradoresPorTerritorioDeLobos lobo = zip (territorios lobo) (lobosPorTerritorio (territorios lobo) lobo)
+
+exploradoresPorTerritorio :: Manada -> [(Territorio, [Nombre])]
+exploradoresPorTerritorio (M lobo) = exploradoresPorTerritorioDeLobos lobo
+
+estaLoboEn :: Nombre -> Lobo -> Bool
+estaLoboEn n (Cria nl) = n == nl
+estaLoboEn n (Cazador nl _ l1 l2 l3) = n == nl || estaLoboEn n l1 || estaLoboEn n l2 || estaLoboEn n l3
+estaLoboEn n (Explorador nl _ l1 l2) = n == nl || estaLoboEn n l1 || estaLoboEn n l2
+
+lobosHasta :: Nombre -> Lobo -> [Nombre]
+lobosHasta n (Cria nl) = []
+lobosHasta n (Explorador nl _ l1 l2) = if estaLoboEn n l1 then lobosHasta n l1 else lobosHasta n l2
+lobosHasta n (Cazador nl l l1 l2 l3) =  if n == nl then [] else if estaLoboEn n l1 then nl:  lobosHasta n l1 else if estaLoboEn n l2 then nl: lobosHasta n l2 else nl :lobosHasta n l3
+
+superioresDelCazador :: Nombre -> Manada -> [Nombre]
+superioresDelCazador n (M lobo) = lobosHasta n lobo
