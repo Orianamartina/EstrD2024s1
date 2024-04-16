@@ -110,7 +110,7 @@ levelN n (NodeT x t1 t2) = if n == 0 then [x] else (levelN (n-1) t1) ++ (levelN 
 zipL :: [[a]] -> [[a]] -> [[a]]
 zipL [] l = l
 zipL l [] = l
-zipL (x:xs) (y:ys) = (x ++ y) ++ zipL xs ys
+zipL (x:xs) (y:ys) = (x ++ y) : zipL xs ys
 
 listPerLevel :: Tree a -> [[a]]
 listPerLevel EmptyT = [[]]

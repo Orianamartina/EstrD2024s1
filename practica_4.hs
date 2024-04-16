@@ -42,7 +42,7 @@ cantCapasPorPizza (x:xs) = ((cantidadDeCapas x), x) : cantCapasPorPizza xs
 --2
 
 data Dir = Izq | Der deriving Show
-data Objeto = Tesoro | Chatarra
+data Objeto = Tesoro | Chatarra deriving Show
 data Cofre = Cofre [Objeto]
 data Mapa = Fin Cofre | Bifurcacion Cofre Mapa Mapa
 
@@ -85,14 +85,36 @@ longitud (x:xs) = 1 + longitud xs
 listaMasLarga :: [a] -> [a] -> [a]
 listaMasLarga l1 l2 = if longitud(l1) > longitud(l2) then l1 else l2
 
-
 caminoDeLaRamaMasLarga :: Mapa -> [Dir]
 caminoDeLaRamaMasLarga (Fin _) = []
 caminoDeLaRamaMasLarga (Bifurcacion _ m1 m2) =  listaMasLarga (Izq : caminoDeLaRamaMasLarga m1) (Der : caminoDeLaRamaMasLarga m2)
 
+tesorosDe :: [Objeto] -> [Objeto]
+tesorosDe [] = []
+tesorosDe (x:xs) = if esTesoro x then x : tesorosDe xs else tesorosDe xs
 
--- caminoDeLaRamaMasLarga (Bifurcacion (Cofre [Chatarra, Chatarra]) (Fin (Cofre [Chatarra, Chatarra])) (Bifurcacion (Cofre [Chatarra, Chatarra]) (Fin (Cofre [Chatarra])) (Bifurcacion (Cofre [Tesoro]) (Bifurcacion (Cofre [Chatarra, Chatarra]) (Fin (Cofre [Chatarra, Chatarra])) (Fin (Cofre [Chatarra, Chatarra]))) (Fin (Cofre [Chatarra, Chatarra])))))
+tesorosDeCofre :: Cofre -> [Objeto]
+tesorosDeCofre (Cofre []) = []
+tesorosDeCofre (Cofre lista) = tesorosDe lista
 
+zipL :: [[a]] -> [[a]] -> [[a]]
+zipL [] l = l
+zipL l [] = l
+zipL (x:xs) (y:ys) = (x ++ y) : zipL xs ys
+
+tesorosPorNivel :: Mapa -> [[Objeto]]
+tesorosPorNivel (Fin cofre) = [tesorosDeCofre cofre]
+tesorosPorNivel (Bifurcacion cofre m1 m2) = tesorosDeCofre cofre : (zipL (tesorosPorNivel m1) (tesorosPorNivel m2))
+
+todosLosCaminos :: Mapa -> [[Dir]]
+todosLosCaminos (Fin _) = [[]]
+todosLosCaminos (Bifurcacion _ m1 m2) = (agregarAlPrincipio Izq (todosLosCaminos m1)) ++ (agregarAlPrincipio Der (todosLosCaminos m2))
+
+agregarAlPrincipio :: a -> [[a]] -> [[a]]
+agregarAlPrincipio x [] = []
+agregarAlPrincipio x (y:ys) = (x:y) : agregarAlPrincipio x ys
+
+-- ej: (Bifurcacion (Cofre [Chatarra, Chatarra]) (Fin (Cofre [Chatarra, Chatarra])) (Bifurcacion (Cofre [Chatarra, Chatarra]) (Fin (Cofre [Chatarra])) (Bifurcacion (Cofre [Tesoro]) (Bifurcacion (Cofre [Chatarra, Chatarra]) (Fin (Cofre [Chatarra, Chatarra])) (Fin (Cofre [Chatarra, Chatarra]))) (Fin (Cofre [Chatarra, Chatarra])))))
 
 --3 
 data Componente = LanzaTorpedos | Motor Int | Almacen [Barril] deriving Show
@@ -205,8 +227,84 @@ tripulantesEn (NodeT (S _ _ tr) t1 t2)  = agregarSiNoEstan tr (tripulantesEn t1 
 tripulantes :: Nave -> [Tripulante]
 tripulantes (N tree) = tripulantesEn tree
 
+-- ej (N (NodeT (S "1" [LanzaTorpedos, (Motor 6), (LanzaTorpedos), (Almacen [Comida, Torpedo])] []) (NodeT (S "2" [LanzaTorpedos, (Motor 10)] []) (EmptyT) (EmptyT)) (NodeT (S "3" [(Motor 1), LanzaTorpedos, (Almacen [Comida, Oxigeno, Combustible])] []) (EmptyT) (EmptyT))))
+
 --4
+type Presa = String -- nombre de presa
+type Territorio = String -- nombre de territorio
+type Nombre = String -- nombre de lobo
+data Lobo = Cazador Nombre [Presa] Lobo Lobo Lobo | Explorador Nombre [Territorio] Lobo Lobo | Cria Nombre deriving Show
+data Manada = M Lobo deriving Show
+
+manada :: Manada
+manada = (M (Cazador "lobo_cazador" ["presa_1", "presa_2", "Presa_3"] (Explorador "lobo_explorador_1" ["territorio_1", "territorio_2", "territorio_3"] (Cria "cria_1")(Cria "cria_2"))(Explorador "lobo_explorar_2" ["territorio_4", "territorio_5"] (Cria "cria_3")(Cria "cria_4"))(Cria "cria_5")))
+
+manada_2 :: Manada
+manada_2 = (M (Cazador "lobo_cazador" ["presa_1", "presa_2", "Presa_3", "presa_4", "presa_5"] (Explorador "lobo_explorador_1" ["territorio_1", "territorio_2", "territorio_3"] (Cria "cria_1")(Cria "cria_2"))(Explorador "lobo_explorar_2" ["territorio_4", "territorio_5"] (Cria "cria_3")(Cria "cria_4"))(Cazador "cazador_2" ["presa_6", "presa_7", "presa_8", "presa_9"] (Cria "cria_6") (Cria "cria_7") (Cria "cria_8"))))
+
+lobo_1 :: Lobo
+lobo_1 = (Cazador "lobo_cazador" ["presa_1", "presa_2", "Presa_3", "presa_4", "presa_5"] (Explorador "lobo_explorador_1" ["territorio_1", "territorio_2", "territorio_3", "territorio_4", "territorio_5"] (Cria "cria_1")(Cria "cria_2"))(Explorador "lobo_explorar_2" ["territorio_4", "territorio_5"] (Cria "cria_3")(Cria "cria_4"))(Cazador "cazador_2" ["presa_6", "presa_7", "presa_8", "presa_9"] (Cria "cria_6") (Cria "cria_7") (Cria "cria_8")))
 
 
--- agregarASector l id (N (NodeT (S sid c t))) = if id == sid then (N (NodeT (S sid (c++l) t))) 
--- (N (NodeT (S "1" [LanzaTorpedos, (Motor 6), (LanzaTorpedos), (Almacen [Comida, Torpedo])] []) (NodeT (S "2" [LanzaTorpedos, (Motor 10)] []) (EmptyT) (EmptyT)) (NodeT (S "3" [(Motor 1), LanzaTorpedos, (Almacen [Comida, Oxigeno, Combustible])] []) (EmptyT) (EmptyT))))
+buenaCazaDeLobos :: Lobo -> Int
+buenaCazaDeLobos (Cria _) = -1
+buenaCazaDeLobos (Explorador _  _ l1 l2) = buenaCazaDeLobos l1 + buenaCazaDeLobos l2
+buenaCazaDeLobos (Cazador _ p l1 l2 l3) = longitud p + buenaCazaDeLobos l1 + buenaCazaDeLobos l2 + buenaCazaDeLobos l3
+
+buenaCaza :: Manada -> Bool
+buenaCaza (M lobo) = buenaCazaDeLobos lobo > 0
+
+elQueMasCazo :: (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int)
+elQueMasCazo (n1, c1) (n2, c2) = if c1 > c2 then (n1, c1) else (n2, c2) 
+
+elAlfaDeLobos :: Lobo -> (Nombre, Int)
+elAlfaDeLobos (Cria n) = (n, 0)
+elAlfaDeLobos (Explorador n _ l1 l2) = elQueMasCazo (n, 0) (elQueMasCazo (elAlfaDeLobos l1) (elAlfaDeLobos l2))
+elAlfaDeLobos (Cazador n p l1 l2 l3) = elQueMasCazo (n, longitud p) (elQueMasCazo (elAlfaDeLobos l1) (elQueMasCazo (elAlfaDeLobos l2) (elAlfaDeLobos l3)))
+
+elAlfa :: Manada -> (Nombre, Int)
+elAlfa (M lobo) = elAlfaDeLobos lobo
+
+-- losLobosQueExploraron :: Territorio -> Lobo -> [Nombre]
+-- losLobosQueExploraron _ (Cria _)  = []
+-- losLobosQueExploraron t (Cazador _ _ l1 l2 l3) = losLobosQueExploraron t l1 ++ losLobosQueExploraron t l2 ++ losLobosQueExploraron t l3 
+-- losLobosQueExploraron t (Explorador n tr l1 l2) = if n == t then n : (losLobosQueExploraron l1 ++ losLobosQueExploraron l2) else (losLobosQueExploraron l1 ++ losLobosQueExploraron l2)
+
+-- losQueExploraron :: Territorio -> Manada -> [Nombre]
+-- losQueExploraron t (M lobo) = losLobosQueExploraron t lobo
+
+-- territoriosDe :: Nombre -> [Territorio] -> [(Territorio, Nombre)]
+-- territoriosDe _ [] = []
+-- territoriosDe n (x:xs) = (n, x) : territoriosDe n xs
+
+-- exploradoresPorTerritorioDeLobos :: Lobo -> [(Territorio, Nombre)]
+-- exploradoresPorTerritorioDeLobos (Cria _) = []
+-- exploradoresPorTerritorioDeLobos (Cazador _ _ l1 l2 l3) = exploradoresPorTerritorioDeLobos l1 ++ exploradoresPorTerritorioDeLobos l2 ++ exploradoresPorTerritorioDeLobos l3
+-- exploradoresPorTerritorioDeLobos (Explorador n tr l1 l2) = territoriosDe n tr ++ exploradoresPorTerritorioDeLobos l1 ++ exploradoresPorTerritorioDeLobos l2
+
+-- exploradoresPorTerritorioDeLobos :: Lobo -> [(Lobo, [Territorio])]
+-- exploradoresPorTerritorioDE
+
+-- sub :: Territorio -> Nombre -> [(Territorio, [Nombre])]
+-- sub t n = 
+
+-- agruparRepetidos :: [(Territorio, Nombre)] -> [(Territorio, [Nombre])]
+-- agruparRepetidos [] = []
+-- agruparRepetidos ((t, n):xs) =  
+
+-- exploradoresPorTerritorio :: Manada -> [(Territorio, [Nombre])]
+-- exploradoresPorTerritorio (M lobo) = exploradoresPorTerritorioDeLobos lobo
+
+territorios :: Lobo -> [Territorio]
+territorios (Cria _) = []
+territorios (Cazador _ _ l1 l2 l3) = territorios l1 ++ territorios l2 ++ territorios l3
+territorios (Explorador _ tr l1 l2) = tr ++ territorios l1 ++ territorios l2
+
+lobosQueExploraron :: Territorio -> Lobo -> [Nombre]
+lobosQueExploraron _ (Cria _) = []
+lobosQueExploraron t (Explorador n tr l1 l2) = if estaEn t tr then n : lobosQueExploraron t l1 ++ lobosQueExploraron t l2 else lobosQueExploraron t l1 ++ lobosQueExploraron t l2 
+lobosQueExploraron t (Cazador _ _ l1 l2 l3) = lobosQueExploraron t l1 ++ lobosQueExploraron t l2 ++ lobosQueExploraron t l3
+
+lobosPorTerritorio :: [Territorio] -> Lobo -> [Nombre]
+lobosPorTerritorio [] _ = []
+lobosPorTerritorio (x:xs) lobo = lobosQueExploraron x lobo : lobosPorTerritorio xs lobo
