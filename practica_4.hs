@@ -295,6 +295,11 @@ elAlfa (M lobo) = elAlfaDeLobos lobo
 -- exploradoresPorTerritorio :: Manada -> [(Territorio, [Nombre])]
 -- exploradoresPorTerritorio (M lobo) = exploradoresPorTerritorioDeLobos lobo
 
+zipL :: [a] -> [b] -> [(a, b)]
+zipL [] _ = []
+zipL _ [] = []
+zipL (x:xs) (y:ys) = (x, y) : zip xs ys
+
 territorios :: Lobo -> [Territorio]
 territorios (Cria _) = []
 territorios (Cazador _ _ l1 l2 l3) = territorios l1 ++ territorios l2 ++ territorios l3
@@ -307,4 +312,4 @@ lobosQueExploraron t (Cazador _ _ l1 l2 l3) = lobosQueExploraron t l1 ++ lobosQu
 
 lobosPorTerritorio :: [Territorio] -> Lobo -> [Nombre]
 lobosPorTerritorio [] _ = []
-lobosPorTerritorio (x:xs) lobo = lobosQueExploraron x lobo : lobosPorTerritorio xs lobo
+lobosPorTerritorio (x:xs) lobo = zipL (territorios lobo) ()
