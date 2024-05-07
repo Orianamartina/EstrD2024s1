@@ -1,7 +1,7 @@
 module Map (Map, emptyM, assocM, lookupM, deleteM, keys) 
 where
 
-data Map k v = M [(k,v)]
+data Map k v = M [(k,v)] deriving Show
 {- INV.REP.: en M kvs, no hay claves repetidas en kvs -}
 
 first :: (k,v) -> k
@@ -17,8 +17,11 @@ isAssoc :: Eq k => k-> [(k,v)] -> Bool
 isAssoc _ [] = False
 isAssoc a (x:xs) =  (first x) == a || isAssoc a xs
 
+removeFromPairs :: Eq k => k -> [(k,v)] -> [(k,v)]
+removeFromPairs a (x:xs) = if a == fst x then xs else x : removeFromPairs a xs
+
 assocM :: Eq k => k -> v -> Map k v -> Map k v
-assocM a b (M pairs) = if not (isAssoc a pairs) then M (pairs ++ [(a,b)]) else (M pairs)
+assocM a b (M pairs) = if not (isAssoc a pairs) then M (pairs ++ [(a,b)]) else (M ((removeFromPairs a pairs) ++ [(a,b)]) )
 
 lookupL ::  Eq k => k -> [(k,v)] -> Maybe v
 lookupL a [] = Nothing
